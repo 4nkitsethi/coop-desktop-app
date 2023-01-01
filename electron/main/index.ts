@@ -147,7 +147,7 @@ ipcMain.handle('open-win', (_, arg) => {
 })
 
 
-const server = 'https://coop-desktop-app.vercel.app'
+const server = 'https://coop-desktop-app-65oe.vercel.app'
 const vercelUrl = `${server}/update/${process.platform}/${app.getVersion()}`
 autoUpdater.setFeedURL({ url : vercelUrl})
 
