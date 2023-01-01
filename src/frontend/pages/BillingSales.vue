@@ -3,7 +3,7 @@
     <div id="tab5" class="tab-content Sales-Tab-Content">
         <div class="SalesPnl">
           <div class="TitelHr pt--2 pb--2 pl--2 pr--2">
-            <h3>{{  $t('Sale') }}</h3>
+            <h3>{{  'Ankit Sethi' }}</h3>
           </div>
           <div class="SalesInfoPnl pt--3 pb--2 pl--3 pr--3">
             <div class="SalesInfoBox DropShadow--Normal">
