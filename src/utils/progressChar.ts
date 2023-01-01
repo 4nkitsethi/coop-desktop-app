@@ -1,0 +1,1 @@
+import EasyPieChart from "easy-pie-chart"
