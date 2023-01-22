@@ -1,8 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain, screen, autoUpdater, dialog } from 'electron'
+import { app, BrowserWindow, shell, ipcMain, screen, dialog } from 'electron'
 import { release } from 'node:os'
 import { join } from 'node:path'
+import logger from 'electron-log'
 
-require('update-electron-app')()
+const { autoUpdater } = require("electron-updater")
+
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -61,7 +63,7 @@ async function createWindow() {
     win.loadURL(url)
     // Open devTool if the app is not packaged
     win.webContents.openDevTools()
-    ses.clearStorageData();
+    //ses.clearStorageData();
   } else {
     win.loadFile(indexHtml)
   }
@@ -80,7 +82,10 @@ async function createWindow() {
   })
 }
 
-app.whenReady().then(createWindow)
+app.whenReady().then(() => {
+  createWindow();
+  autoUpdater.checkForUpdatesAndNotify();
+})
 
 app.whenReady().then(() => {
   const displays = screen.getAllDisplays()
@@ -102,11 +107,12 @@ app.whenReady().then(() => {
         nodeIntegration: true,
         contextIsolation: false,
       }
-    })
-    externalWin.loadFile(indexHtml)
+    })    
+    externalWin.loadURL("http://localhost:5173/")
     externalWin.maximize();
   }
 }).catch(err => console.log(err.message ) )
+
 app.on('window-all-closed', () => {
   win = null
   if (process.platform !== 'darwin') app.quit()
@@ -147,12 +153,19 @@ ipcMain.handle('open-win', (_, arg) => {
 })
 
 
-const server = 'https://coop-desktop-app-65oe.vercel.app'
-const vercelUrl = `${server}/update/${process.platform}/${app.getVersion()}`
-autoUpdater.setFeedURL({ url : vercelUrl})
+/**
+ * Auto Updater
+ *
+ * Uncomment the following code below and install `electron-updater` to
+ * support auto updating. Code Signing with a valid certificate is required.
+ * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-electron-builder.html#auto-updating
+ */
 
 
 autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  
+  win.webContents.send('message','update Downloaded !!');
+
   const dialogOpts = {
     type: 'info',
     buttons: ['Restart', 'Later'],
@@ -167,14 +180,35 @@ autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
   })
 })
 
-
-autoUpdater.on('error', (message) => {
-  console.error('There was a problem updating the application')
-  console.error(message)
+autoUpdater.on('checking-for-update', () => {
+  win.webContents.send('message','CHECKING FOR UPDATES !!');  
 })
 
+autoUpdater.on('update-available', () => {  
+  win.webContents.send('message',' update-available !!');    
+  autoUpdater.downloadUpdate();
+})
 
-setInterval(() => {
-  autoUpdater.checkForUpdates()
-}, 60000)
+autoUpdater.on('error', (error) => {
+  win.webContents.send('message',error);
+  autoUpdater.logger.debug(error);
+})
+
+autoUpdater.on('download-progress', (progressObj) => {  
+  win.webContents.send('message',{
+    status: 'downloading',
+    download: {
+      bytesPerSecond: progressObj.bytesPerSecond,
+      percent: progressObj.percent,
+      transferred: progressObj.transferred,
+      total: progressObj.total
+    }
+  });
+});
+
+
+
+
+
+
 

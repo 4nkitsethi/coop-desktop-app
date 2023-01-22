@@ -1,6 +1,6 @@
 <template>
-   
-    <div class="print-riceipt" v-if="printFlag" style="text-align:center">
+    <CustomerView v-if="isCustomerView"/>
+    <div class="print-riceipt" v-else-if="printFlag" style="text-align:center">
         <div class="ticket">
             <img src="../../assets/img/logo.png" alt="Logo" />
             <p>{{ activeCustomer.name }} <br> {{  activeCustomer.phone  }}  </p>
@@ -37,13 +37,13 @@
             </table>
             <p class="centered">Thanks for your purchase ! <br />  Visit Again -:) </p>
         </div>
-    </div>
+    </div>    
     <div class="tabs" v-else> 
         <template v-if="lockApplication">
             <LockScreen />
         </template>
         <template v-else>
-            <BillingSidebar  v-if="!customerView" />
+            <BillingSidebar />
             <!--Right Part start-->
             <div class="Tabs-box" id="tabs-content">
                 <router-view></router-view>
@@ -54,6 +54,7 @@
 
 <script lang="ts">
     import BillingSidebar from './BillingSidebar.vue';
+    import CustomerView from './CustomerView.vue';
     import LockScreen from "../auth/Lock.vue"
     import {mapState} from "vuex"
     import { currency } from '../../utils/currency';
@@ -63,8 +64,7 @@
         data(){
             return {
                 currency,
-                sumBy,
-                customerView:false,
+                sumBy,                
                 displayType:"INTERNAL",
             }
         },
@@ -78,18 +78,21 @@
                 
             })
         },
-        created(){     
-
-            console.log(this.displayType)      
+        created(){          
             if(this.displayType != 'INTERNAL'){
                 this.customerView = true
             } 
         },
         components:{
             BillingSidebar,
-            LockScreen
+            LockScreen,
+            CustomerView
         },
+    
         computed: {        
+            isCustomerView(){
+                return  this.$route.meta.customerView;
+            },
             ...mapState('coop_local_base/apps', {
                                             printFlag: (state) => state.printFlag,
                                             cartItems: (state) => state.cartItems,

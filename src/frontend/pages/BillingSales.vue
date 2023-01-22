@@ -3,7 +3,7 @@
     <div id="tab5" class="tab-content Sales-Tab-Content">
         <div class="SalesPnl">
           <div class="TitelHr pt--2 pb--2 pl--2 pr--2">
-            <h3>{{  'Ankit Kumar' }}</h3>
+            <h3>{{  $t('Sale',2) }}</h3>
           </div>
           <div class="SalesInfoPnl pt--3 pb--2 pl--3 pr--3">
             <div class="SalesInfoBox DropShadow--Normal">
@@ -97,8 +97,6 @@ import { head, isNaN } from "lodash"
                 this.widgets.max = parseFloat(widget.max)
                 this.widgets.avg = parseFloat(widget.avg)
                 this.widgets.total = parseFloat(widget.total)
-
-                console.log(widget)
                 this.chartOptions = {
                                     ...this.chartOptions,
                                      ...{

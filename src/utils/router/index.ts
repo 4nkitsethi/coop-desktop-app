@@ -3,7 +3,6 @@ import BillingSystem from "../../frontend/pages/BillingSystem.vue"
 import BillingStock from "../../frontend/pages/BillingStock.vue"
 import BillingSales from "../../frontend/pages/BillingSales.vue"
 import BillingCustomers from "../../frontend/pages/Customers.vue"
-import CustomerView from "../../frontend/pages/CustomerView.vue"
 import CustomerInfo from "../../frontend/pages/CustomerInfo.vue"
 
 // 2. Define some routes
@@ -14,12 +13,12 @@ const routes = [
     path: '', 
     component: BillingSystem
   },
-  { path: '/', component: BillingSystem },
-  { path: '/billing', component: BillingSystem },
-  { path: '/stocks', component: BillingStock , name : "Stocks"},
-  { path: '/sales', component: BillingSales }, 
-  { path : '/customers', component : BillingCustomers},
-  { path : '/customer-view' , component : CustomerView } 
+  { path: '/', component: BillingSystem , meta : { customerView : false } },
+  { path: '/billing', component: BillingSystem , meta : { customerView : false } },
+  { path: '/stocks', component: BillingStock , name : "Stocks" , meta : { customerView : false }},
+  { path: '/sales', component: BillingSales , meta : { customerView : false } }, 
+  { path : '/customers', component : BillingCustomers , meta : { customerView : false }}  ,
+  { path : '/customer-view', component : BillingCustomers , meta : { customerView : true }}  
 ]
 
 // 3. Create the router instance and pass the `routes` option

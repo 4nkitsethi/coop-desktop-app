@@ -1,7 +1,9 @@
 <template>
     <!--Left Part start-->
     <div class="SplitPnl SplitPnl-Left Text--Center">
-      <div class="Top-Logo-Part"><a class="SiteLogo" href="#"><img src="../../assets/img/logo.png" alt=""/></a></div>
+      <div class="Top-Logo-Part" style="position:relative">
+        <a class="SiteLogo" href="#"><img src="../../assets/img/logo.png" alt=""/></a>        
+      </div>
       <div class="LeftNav" id="tabs-nav">
         <div class="Child-Item mb--18"><router-link to="/billing" class="Btn-Normal DropShadow--Normal ">{{ $t('Billing') }}</router-link></div>
         <div class="Child-Item mb--18"><router-link to="/stocks" class="Btn-Normal DropShadow--Normal">{{ $t('Stock',2) }}</router-link><Icon icon="carbon:notification-filled" class="Stock-Notification" v-if="isStockNotify > 0"/></div>

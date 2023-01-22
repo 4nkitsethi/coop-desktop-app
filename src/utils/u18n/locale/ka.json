@@ -86,5 +86,6 @@
     "EditCustomersInfo":"ಮಾಹಿತಿ",
     "PayAfterSalesCompleted": "ಮಾರಾಟದ ನಂತರ",
     "PayWhenStockReceived" : "ಸ್ವೀಕರಿಸಿದಾಗ",
-    "New":"ನವೀನ" 
+    "New":"ನವೀನ",
+    "CashPayment" : "ನಗದು"
 }

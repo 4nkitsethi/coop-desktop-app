@@ -6,8 +6,8 @@
             <form action="" method="post">
               <h6 class="Text--Left mb--1">{{ $t('CustomerMobileNumber')}} </h6>
               <ul class="">
-                <li class="">                  
-                  <input type="text" id="number-input-text" :placeholder="$t('EnterMobileNo')"   class="inputStyle" v-maska  data-maska="##########" maxlength="10" @input="loadCustomer" />
+                <li class="">   
+                  <input type="text"  class="inputStyle mb--1 keyboard-phone" @input="loadCustomer"  placeholder="Customer Mobile Number ..." data-pattern="number" data-phone="true"/>             
                 </li>
               </ul>
             </form>
@@ -23,7 +23,7 @@
               <form action="" method="get">
                 <ul class="d--flex align--top">
                   <li> 
-                    <input class="inputStyle" :value="selectedCustomer.phone"  v-maska  data-maska="##########" maxlength="10" @input="loadCustomer" />
+                    <input type="text"  class="inputStyle mb--1 keyboard-phone" @input="loadCustomer"  placeholder="Customer Mobile Number ..." data-pattern="number" data-phone="true" :value="selectedCustomer.phone"/>             
                   </li>
                   <li>
                     <input class="inputStyle" name="" type="text" :value="selectedCustomer.name" disabled style="cursor: not-allowed;">
@@ -31,7 +31,7 @@
                 </ul>
               </form>
             </div>
-            <div class="Top-Box Sub-Topbox"> <a href="javascript:void(0);" id="Current-List-Btn" class="Btn-Normal DropShadow--Normal Edit-Customer-Info-Btn Text--Dark-Green pl--2 pr--2" @click.prevent="editCustomerDetail=true">{{ $t('Edit')}}</a> </div>
+            <div class="Top-Box Sub-Topbox"> <a href="javascript:void(0);" id="Current-List-Btn" class="Btn-Normal DropShadow--Normal Edit-Customer-Info-Btn Text--Dark-Green pl--2 pr--2" @click.prevent="editCustomerDetail=true; this.onscreenKeyboard()">{{ $t('Edit')}}</a> </div>
             <div class="Top-Box">
               <div class="Pending-Ammount d--flex justify--space-between mb--18">
                 <div>
@@ -80,7 +80,7 @@
                         <tbody class="d--block">
                           <tr class="d--block" v-for="sale in detail.sales" :key="sale.id">
                             <td class="pt--half pr--24 pb--half pl--24 Text--Left no--border Width--10">{{ sale.product.product_name }}</td>
-                            <td class="pt--half pr--24 pb--half pl--24 Text--Left no--border Width--10">{{ sale.quantity +' '+ sale.product.weight_unit }}</td>
+                            <td class="pt--half pr--24 pb--half pl--24 Text--Left no--border Width--10">{{ scale(sale.quantity,2) +' '+ sale.product.weight_unit }}</td>
                             <td class="pt--half pr--24 pb--half pl--24 Text--Left no--border Width--10">{{ currency(sale.rate )}}</td>                            
                             <td class="pt--half pr--24 pb--half pl--24 Text--Left no--border Width--10">{{ currency(sale.total )}}</td>                            
                           </tr>
@@ -115,7 +115,7 @@
                           <input class="inputStyle" v-model="selectedCustomer.phone" disabled readonly style="cursor:not-allowed">
                         </li>
                         <li class="mb--18">
-                          <input class="inputStyle" v-model="selectedCustomerName" type="text" >
+                          <input v-model="selectedCustomerName" :placeholder="'Customer Name ...'" class="inputStyle keyboard-alpha" />                          
                         </li>
                       </ul>
                     </form>
@@ -138,7 +138,7 @@
 
 
 <script lang="js">
-import { currency } from "../../utils/currency"
+import { currency,scale } from "../../utils/currency"
 import { isEmpty , head, find, isNil, sumBy, forEach, assignIn} from "lodash"
 import { Customer } from "../../models"
 import moment from "moment"
@@ -152,6 +152,7 @@ export default {
       sumBy,
       isEmpty,
       currency,
+      scale,
       editCustomerDetail:false,
       receiptNo : `coop-cps-${Math.round(new Date().getTime() / 1000)}` ,    
       selectedCustomer:null,
@@ -161,6 +162,7 @@ export default {
   methods:{ 
     updateCustomer(){
       const customer = Customer.query().where('phone', Number(this.selectedCustomer.phone)).first()
+      console.log(this.selectedCustomerName);
       customer.name = this.selectedCustomerName
       customer.data_sync = false
       customer.$save();      
@@ -190,26 +192,35 @@ export default {
         var rzp1 = new Razorpay(paymentOption);
         rzp1.open();
         //        
-    },  
-    loadCustomer(event) {
-      if(event.target.value.length == 10){               
-        const customer = Customer.query().where('phone', Number(event.target.value)).first()        
-        if(isEmpty(customer)){            
-          this.$toast.warning("Customer not found !")   
-        }else{          
-          let url = '/customer/'+customer.phone+'/full';
-          this.axios
-            .get(url)
-            .then( res => {
-                            this.selectedCustomer = res.data.customer
-                            this.selectedCustomerName = this.selectedCustomer.name
-                            this.$toast.success("Customer detail loaded !")
-            })
-            .catch( err => {              
-              this.$toast.error(err.message)
-            })                
-        }       
-      }
+    },      
+    loadCustomer(e) {      
+      //
+      if(!isEmpty(e.target.value) && e.target.value.length == 10){       
+          if(!isEmpty(this.selectedCustomer)){
+            if(this.selectedCustomer.phone == e.target.value)
+              return false 
+          }
+          // 
+          const customer = Customer.query().where('phone', Number(e.target.value)).first()        
+          if(isEmpty(customer)){            
+            this.$toast.warning("Customer not found !")   
+          }else{          
+            let url = '/customer/'+customer.phone+'/full';
+            this.axios
+              .get(url)
+              .then( res => {
+                              this.selectedCustomer = res.data.customer
+                              this.selectedCustomerName = this.selectedCustomer.name
+                              this.onscreenKeyboard();   
+                              this.$toast.success("Customer detail loaded !")
+              })
+              .catch( err => {              
+                this.$toast.error(err.message)
+              })                
+          }       
+      }else{
+        this.$toast.info("Enter a valid mobile number ")
+      }      
     },
     savePayment(razorpayPaymentId){ 
       const customer = Customer.query().where('phone', Number(this.selectedCustomer.phone)).first()
@@ -227,7 +238,6 @@ export default {
                                       shop : (state) => state.shop,
                                       razorPayOption: (state) => state.razorPayOption
     }),
-  },
-  setup() {}
+  }
 }
 </script>

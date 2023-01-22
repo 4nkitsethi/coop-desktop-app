@@ -22,20 +22,24 @@ import 'vue-toast-notification/dist/theme-sugar.css';
 import { App } from './models'
 import { head } from "lodash"
 
-
 //console.log(App.state.baseURL)
 
-axios.defaults.baseURL = "http://coop-chicken.in/api/";
+axios.defaults.baseURL = "https://coop-chicken.in/api/";
 axios.defaults.headers.post['Content-Type'] = 'application/json';
+import $ from 'jquery';
+window.$ = $;
+import './keyboard/jquery-ui.min.css'
+import './keyboard/keyboard.css'
+import './keyboard/js/jquery-ui-custom.min'
+import './keyboard/js/jquery.keyboard'
+import './keyboard/js/jquery.keyboard.extension-typing'
+// 
+import "vue3-circle-progress/dist/circle-progress.css";
+import CircleProgress from "vue3-circle-progress";
 
 createApp({
     extends: Layout,
-    beforeCreate() {
-                    // console.log(window.screen.width)
-                    // if(window.screen.width == 1476){
-                    //   this.$router.push("/customer-view")
-                    // }
-    }
+    beforeCreate() {}
   })
   .use(Store)
   .use(Router)
@@ -45,8 +49,154 @@ createApp({
   .directive('debounce', vue3Debounce({ lock: true }))
   .use(VueAxios, axios)
   .component('Icon',Icon)
-  .component('apexchart', VueApexCharts)
-  .mount('#app')
+  .component('apexchart', VueApexCharts)  
+  .component('CircleProgress',CircleProgress)
+  .mixin({        
+        methods:{
+            initializePie(){},
+            onscreenKeyboard(){
+              setTimeout(() => {
+                let self = this;
+                $('.keyboard-numpad').keyboard({
+                  layout: 'custom',
+                  display: {
+                    'bksp'   : '\u2190',
+                    'enter'  : 'return',
+                    'normal' : 'ABC',
+                    'meta1'  : '.?123',
+                    'meta2'  : '#+=',
+                    'accept' : '✔',
+                    'cancel' : '✖',
+                    'clear'  : '&nbsp;&nbsp;&nbsp;&nbsp;Clear&nbsp;&nbsp;&nbsp;&nbsp;'
+                  },
+                  customLayout: {
+                    'normal': [
+                      '1 2 3 4',
+                      '5 6 7 8',
+                      '9 0 {dec} {bksp}',			  
+                      '{clear} {accept} {cancel}'
+                    ]
+                  },
+                  restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+                  preventPaste : true,  // prevent ctrl-v and right click
+                  autoAccept : true,
+                  change: function(e, keyboard, el) {
+                    if (typeof e.target.dataset.pattern !== 'undefined') {
+                      let val = null
+                      if(e.target.dataset.pattern == 'number' && e.target.dataset.phone == 'true')
+                        val = keyboard.$preview.val().match(new RegExp(/(\d{0,10})?/));
+                      else if(e.target.dataset.pattern == 'decimal')
+                        val = keyboard.$preview.val().match(new RegExp(/(\d+)(\.\d{0,2})?/));
+                      else if(e.target.dataset.pattern == 'number')
+                        val = keyboard.$preview.val().match(new RegExp(/(\d+)?/));
+                      
+                      if (val) {
+                        keyboard.$preview.val(val.slice(1).join(''));
+                        $.keyboard.caret(keyboard.$preview, keyboard.last.start, keyboard.last.end);                
+                      }
+                    }            
+                  },
+                  validate: function(keyboard, value, isClosing){                 
+                    if(typeof keyboard.$el[0].dataset.phone !== 'undefined')
+                        return (value.length == 10) ? true : false
+                                   
+                    if (typeof keyboard.$el[0].dataset.max !== 'undefined') {
+                      let min = parseFloat(keyboard.$el[0].dataset.min)
+                      let max = parseFloat(keyboard.$el[0].dataset.max)
+                      return (value > min && value<=max) ? true : false; 
+                    }else{
+                      return true
+                    }                   
+                  },
+                  accepted: function(e, keyboard, el) {            
+                    el.value = keyboard.getValue();            
+                    el.dispatchEvent(new Event('input'));
+                  }
+                });
+
+
+                $('.keyboard-phone').keyboard({
+                  layout: 'custom',
+                  display: {
+                    'bksp'   : '\u2190',
+                    'enter'  : 'return',
+                    'normal' : 'ABC',
+                    'meta1'  : '.?123',
+                    'meta2'  : '#+=',
+                    'accept' : '✔',
+                    'cancel' : '✖',
+                  },
+                  customLayout: {
+                    'normal': [
+                      '1 2 3 4',
+                      '5 6 7 8',
+                      '9 0 {bksp} {clear}',			  
+                      '{accept} {cancel}'
+                    ]
+                  },
+                  maxLength : 10,
+                  restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+                  preventPaste : true,  // prevent ctrl-v and right click
+                  autoAccept : true,
+                  acceptValid: true,
+                  validate: function(keyboard, value, isClosing){                 
+                    return value.length === 10;                   
+                  },
+                  accepted: function(e, keyboard, el) {            
+                    el.value = keyboard.getValue();            
+                    el.dispatchEvent(new Event('input'));
+                  }
+                });
+              
+              
+                $('.keyboard-alpha').keyboard({
+                  layout: 'custom',
+                  display: {
+                    'bksp'   : '\u2190',
+                    'enter'  : 'return',
+                    'normal' : 'ABC',
+                    'meta1'  : '123',
+                    'meta2'  : '#+=',
+                    'accept' : '✔',
+                    'cancel' : '✖'
+                  },   
+                  customLayout: {
+                    'normal': [
+                      'q w e r t y u i o p {bksp}',
+                      '{s} a s d f g h j k l -',
+                      'z x c v b n m @ . {left} {right}',
+                      '{clear} .com {meta1} {space} {cancel} {accept}'
+                    ],
+                    'shift': [
+                      'Q W E R T Y U I O P {bksp}',
+                      '{s} A S D F G H J K L -',
+                      'Z X C V B N M @ . {left} {right}',
+                      '.com {meta1} {space} {cancel} {accept}'
+                    ],
+                    'meta1': [
+                      '1 2 3 4 5 6 7 8 9 0 {bksp}',
+                      '` | { } % ^ * / \' ! ?',
+                      '{normal} $ & ~ # = + . {cancel} {accept}',
+                      ' {space} '
+                    ]
+                  },
+                  restrictInput : true, // Prevent keys not in the displayed keyboard from being typed in
+                  preventPaste : true,  // prevent ctrl-v and right click
+                  autoAccept : true,
+                  accepted: function(e, keyboard, el) {            
+                    el.value = keyboard.getValue();            
+                    el.dispatchEvent(new Event('input'));
+                  }
+                })
+                .addTyping();
+              }, 500); 
+            }
+        },
+        beforeMount() {
+          this.onscreenKeyboard()
+        }
+  })
+  .mount('#app')  
   .$nextTick(() => {
     postMessage({ payload: 'removeLoading' }, '*')
   })

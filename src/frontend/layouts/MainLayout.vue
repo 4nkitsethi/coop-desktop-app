@@ -3,7 +3,6 @@
         <BillingLayout v-if="isAuthenticated"/>
         <Login  v-else/>
     </div>
-
     <div class="Not-Supported-Div Text--Center d--flex justify--center align--center" v-show="!printFlag">
         <div class="mb--2"><img src="../../assets/img/logo.png" alt=""/></div>
         <h3>Your screen size is not supported.</h3>
@@ -14,12 +13,18 @@
     import Login from "../auth/Login.vue"
     import { mapState } from 'vuex'
     import BillingLayout from "./BillingLayout.vue"
+    import {isEmpty} from 'lodash'
     
     export default {
         name:'Layout',
         components:{
             Login,
             BillingLayout
+        },
+        data(){
+            return {
+                isEmpty
+            }
         },
         computed: {        
             ...mapState('coop_local_base/apps', {

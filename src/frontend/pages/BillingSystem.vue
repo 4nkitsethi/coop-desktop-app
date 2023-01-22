@@ -13,12 +13,12 @@
         </div>
       </div>
       <!--Middle Pannel start-->
-      <div class="MiddleGridPnl">
+      <div class="MiddleGridPnl">        
         <div class="Top-Breadcrumb pl--24 pr--24 pt--half pb--half">
           <span class="pr--3">{{ $t('ChooseItem', 2) }}</span>
           <span class="Item-Name Text--Yellow">{{ isEmpty(activeProduct) ? '' : activeProduct.product_name }}</span>
         </div>
-        <div class="Bottom-ProductPnl">
+        <div class="Bottom-ProductPnl">         
           <div class="MainProductPnl" id="MainProductPnl">
             <div class="Product-Item DropShadow--Normal Overflow--hidden ma--15" :class="{'DropShadow--Active':(activeProductId == product.id)}" v-for="product in products" :key="product.id" @click.prevent="activeProductId = product.id">
               <div class="Product-Type Product-Type-Top pa--1" style="position:relative">                
@@ -26,18 +26,33 @@
                   <img :src="product.raw_image" class="logo mb--1">
                   <h4> {{ product.product_name }}</h4>
                 </div>
-                <div class="Flip-Box-shadow Main-Flip-Box" :ref="'product-panel-'+product.id" @click="this.$refs['product-panel-'+product.id][0].classList.toggle('Active')">
-                  <div class="Main-chart" >
-                    <span :class="'current-stock-chart-'+product.id" :data-percent="(product.association.stock/product.association.totalQtyPerDay) * 100"  style="display: flex;justify-content: center;align-items: center;" > 
-                      <span class="Info-Text">{{ $t('Stock') }}</span> 
-                      <span class="percent" >{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small> </span> 
-                    </span>
+
+                <div class="Flip-Box-shadow Main-Flip-Box" :ref="'product-panel-'+product.id">
+                  <div class="Main-chart First-Flip-Box">
+                    <CircleProgress
+                      :percent="(product.association.stock/product.association.totalQtyPerDay) * 100"
+                      :size="89"
+                      :viewport="true"
+                      :transition="2000"    
+                      :fill-color="'#bf8a00'"
+                      :border-width="3"
+                      :border-bg-width="0"
+                    />
+                    <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
+                    <span class="Info-Text p--1">{{ $t('Stock') }}</span> 
                   </div>
-                  <div class="Flip-chart" >
-                    <span :class="'current-sale-chart-'+product.id" :data-percent="(product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100" style="display: flex;justify-content: center;align-items: center;" > 
-                      <span class="Info-Text">{{ $t('Sale') }}</span> 
-                      <span class="percent" >{{ currency(product.association.todaySales) }}</span> 
-                    </span>
+                  <div class="Flip-chart Second-Flip-Box">
+                    <CircleProgress
+                      :percent="(product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
+                      :size="89"
+                      :viewport="true"
+                      :transition="2000"    
+                      :fill-color="'#bf8a00'"
+                      :border-width="3"
+                      :border-bg-width="0"
+                    />
+                    <span class="Info-Text p--1">{{ $t('Sale') }}</span> 
+                    <span class="percent">{{ currency(product.association.todaySales) }}</span> 
                   </div>
                 </div>
               </div>
@@ -77,37 +92,37 @@
     <!--Left Section end-->
 
     <!--Right Section start-->
-    <div class="SplitPnl SplitPnl-Right">
-      <div class="LoginPnl pt--1 pb--1 pl--24 pr--24" id="LoginPnl" v-if="isEmpty(activeCustomer)">
-        <form class="LoginPnlInner" @submit.prevent="saveCustomer">
-          <h3>{{ $t('CustomerInfo') }}</h3>
-          <div class="form-group">
-            <input type="text"  class="inputStyle mb--1 w--73" v-maska  data-maska="##########"  @maska="loadCustomer"  placeholder="Customer Mobile Number ..."/>
-          </div>
-          <div class="form-group display-flex justify-content">
-            <input type="text" v-model="form.customer.name" class="inputStyle mb--1 w--73"  placeholder="Customer Name ..."/>
-            <input type="submit" :value="$t('Go')" class="Submit-Btn-Normal DropShadow--Normal " id="Submitbtn">
-          </div>
-        </form>
-        <!--LoginPnlInner Part-->
-      </div>
-      <div class="TabPnl" id="TabPnl" v-else>
+    <div class="SplitPnl SplitPnl-Right">            
+      <div class="TabPnl" id="TabPnl">
         <div class="Bill-tabs">
           <div class="Cmn-Tabs-Nav pt--1 pb--1 pl--24 pr--24" id="bill-tabs-nav"> 
-            <a href="javascript:void(0)" class="Tab-Btn-Normal DropShadow--Normal mr--2" :class="{'DropShadow--Active Active--BG':billingTab}" @click.prevent="billingTab=true;holdOrderTab=false">{{ $t('BillingDetail') }}</a> 
+            <a href="javascript:void(0)" class="Tab-Btn-Normal DropShadow--Normal mr--2" :class="{'DropShadow--Active Active--BG':billingTab}" @click.prevent="billingTab=true;holdOrderTab=false; onscreenKeyboard()">{{ $t('BillingDetail') }}</a> 
             <a href="javascript:void(0)" class="Tab-Btn-Normal DropShadow--Normal" :class="{'DropShadow--Active Active--BG':holdOrderTab}" @click.prevent="billingTab=false;holdOrderTab=true">{{ $t('HoldOrderHistory')}}</a> 
           </div>
-          <div class="Bill-Tabs-box" id="bill-tabs-content">
+          <div class="Bill-Tabs-box" id="bill-tabs-content">            
             <div id="bill-tab1" class="bill-tab-content" v-if="billingTab">
+              <div class="LoginPnl pt--1 pb--1 pl--24 pr--24" id="LoginPnl" v-if="isEmpty(activeCustomer)">
+                <form class="LoginPnlInner" @submit.prevent="saveCustomer">
+                  <h3>{{ $t('CustomerInfo') }}</h3>
+                  <div class="form-group">
+                    <input type="text"  class="inputStyle mb--1 w--73  keyboard-phone" @input="loadCustomer"  placeholder="Customer Mobile Number ..." data-pattern="number" data-phone="true"/>             
+                  </div>
+                  <div class="form-group display-flex justify-content">
+                    <input type="text" v-model="form.customer.name" class="inputStyle mb--1 w--73 keyboard-alpha"  placeholder="Customer Name ..."/>            
+                    <input type="submit" :value="$t('Go')" class="Submit-Btn-Normal DropShadow--Normal " id="Submitbtn">
+                  </div>
+                </form>
+                <!--LoginPnlInner Part-->
+              </div>
               <!--NameAmount-->
-              <div class="NameAmount pt--09 pb--09 pl--24 pr--24">
+              <div class="NameAmount pt--09 pb--09 pl--24 pr--24" v-if="!isEmpty(activeCustomer)">
                 <div class="NameAmountLft">
                   <p>{{ $t('BillNumber') }}: {{  billNumber  }}</p>
-                  <p>{{ $t('Name') }}:
-                    <input class="Person-Name" :class="{'inputStyle':editCustomerNameFlag}" v-model="activeCustomerName" type="text" :disabled="!editCustomerNameFlag">
+                  <p>{{ $t('Name') }}:                     
+                    <input v-model="activeCustomerName" class="Person-Name keyboard-alpha" :class="{ 'inputStyle' : editCustomerNameFlag}"  :readonly="!editCustomerNameFlag"/>
                     <a class="Save-Name-Btn" href="javascript:void(0);" v-if="editCustomerNameFlag" @click="updateCustomer">{{ $t('Save') }}</a>
                     <a class="Save-Name-Btn" href="javascript:void(0);" v-if="editCustomerNameFlag" @click="editCustomerNameFlag = false">{{ $t('Cancel') }}</a>
-                    <a class="Edit-Name-Btn" href="javascript:void(0);" v-else @click="editCustomerNameFlag = true">{{ $t('Edit') }}</a>                     
+                    <a class="Edit-Name-Btn" href="javascript:void(0);" v-else @click="editCustomerNameFlag = true;onscreenKeyboard()">{{ $t('Edit') }}</a>                     
                   </p>
                   <small>{{  this.activeCustomer.phone }}</small>
                 </div>
@@ -123,7 +138,7 @@
               </div>
               <!--NameAmount-->
 
-              <div class="billingpanel" id="billingFirst" v-if="!generateBillFLag">
+              <div class="billingpanel" id="billingFirst" v-if="!generateBillFLag && !isEmpty(activeCustomer)">
 
                 <!--TablePnl-->
                 <div class="TablePnl">
@@ -138,8 +153,8 @@
                     </thead>
                     <tbody>
                       <tr v-for="cart in cartItems" :key="cart.cartId">
-                        <td>{{ cart.itemName }} <input type="text" :data-cart="cart.cartId" v-debounce:1s="updateCart" v-maska  :data-maska="cart.mask" data-maska-tokens="*:[0-9]:multiple" placeholder="Choose Qty" class="ChooseQty DropShadow--Normal" v-if="!['kg','KG'].includes(cart.unit)"   :value="cart.quantity"/></td>
-                        <td>{{ cart.quantity +' '+ cart.unit}}</td>
+                        <td>{{ cart.itemName }} <input type="text" :data-cart="cart.cartId" @input="updateCart"  placeholder="0" class="text-center ChooseQty DropShadow--Normal keyboard-numpad" v-if="!['kg','KG'].includes(cart.unit)" @click="onscreenKeyboard"  :value="cart.quantity" data-pattern="number"/></td>
+                        <td>{{ ((['',null].includes(cart.quantity)) ? 0 : cart.quantity) +' '+ cart.unit}}</td>
                         <td>{{ currency(cart.total) }}</td>
                         <td>
                           <a href="javascript:void(0);" class="action-Btn-Normal Del-Tbl-Data DropShadow--Normal" @click="removeFromCart(cart)">
@@ -173,7 +188,7 @@
                       </li>
                       <li class="pl--24 pr--24 pt--23 pb--23">
                         <label>{{ $t('ReceivingAmount') }}</label>
-                        <input type="text"  class="Btn-Normal DropShadow--Normal DropShadow--Active Active--BG AmountBox " v-model="receiveAmount"/>
+                        <input type="text"  class="Btn-Normal DropShadow--Normal DropShadow--Active Active--BG AmountBox keyboard-numpad text-center" :data-min="0" :data-max="receiveAmount" v-model="receiveAmount"/>
                       </li>
                       <li id="Round-Off-Ammount" class="pl--24 pr--24 pt--23 pb--23 Dynamic-Row" v-if="paymentType != null">
                         <label>{{ paymentType }} {{ $t('Amount') }}</label>
@@ -193,14 +208,16 @@
                   <a href="javascript:void(0);" id="Pending-Btn"  class="tableBtnArea-Btn-Normal DropShadow--Normal" :class="{'DropShadow--Active' : (paymentType == 'Pending')}" @click="paymentType = 'Pending'">{{ $t('Pending') }}</a> 
                 </div>
               </div>
-              <div class="BottomBtnArea pt--1 pb--1 pl--24 pr--24 display-flex" v-if="generateBillFLag"> 
-                <a href="javascript:void(0);"  class="Btn-Normal DropShadow--Normal Text--Red mr--2 " @click.prevent="savePayment(null)"><img src="../../assets/img/HandSign.png" alt="" class="handIcon" > {{ $t('PayOffline') }} </a> 
-                <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Green" @click.prevent="payOnline">{{ $t('PayOnline') }}</a> 
-              </div>
-              <div class="BottomBtnArea pt--1 pb--1 pl--24 pr--24 display-flex" v-else> 
-                <a href="javascript:void(0);"  class="Btn-Normal DropShadow--Normal Text--Red mr--2 width9" id="myBtn" v-if="!isEmpty(cartItems)" @click="holdOrder"><img src="../../assets/img/HandSign.png" alt="" class="handIcon"> {{ $t('Hold') }}</a> 
-                <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Green" id="NextBtn" @click.prevent="generateBillFLag = true;receiveAmount = getReceiveAmount" v-if="!isEmpty(cartItems)">{{ $t('Next') }}</a> 
-              </div>
+              <template v-if="!isEmpty(activeCustomer)">
+                <div class="BottomBtnArea pt--1 pb--1 pl--24 pr--24 display-flex" v-if="generateBillFLag"> 
+                  <a href="javascript:void(0);"  class="Btn-Normal DropShadow--Normal Text--Red mr--2 " @click.prevent="savePayment(null)"><img src="../../assets/img/HandSign.png" alt="" class="handIcon" > {{ $t('CashPayment') }} </a> 
+                  <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Green" @click.prevent="payOnline">{{ $t('PayOnline') }}</a> 
+                </div>
+                <div class="BottomBtnArea pt--1 pb--1 pl--24 pr--24 display-flex" v-else> 
+                  <a href="javascript:void(0);"  class="Btn-Normal DropShadow--Normal Text--Red mr--2 width9" id="myBtn" v-if="!isEmpty(cartItems)" @click="holdOrder"><img src="../../assets/img/HandSign.png" alt="" class="handIcon"> {{ $t('Hold') }}</a> 
+                  <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Green" id="NextBtn" @click.prevent="generateBillFLag = true;receiveAmount = getReceiveAmount; onscreenKeyboard()" v-if="!isEmpty(cartItems)">{{ $t('Next') }}</a> 
+                </div>
+              </template>
             </div>
             <div id="bill-tab2" class="bill-tab-content" v-if="holdOrderTab">
 
@@ -256,13 +273,12 @@
 <script lang="js">
 import { currency, scale } from "../../utils/currency"
 import { isEmpty , head, find, isNil, sumBy, forEach, assignIn} from "lodash"
-import { mapActions, mapState } from "vuex";
+import {  mapState } from "vuex";
 
 import { Product, Customer, App, Sale, PurchaseHistory, Association } from "../../models"
 import moment from "moment"
-import EasyPieChart from "easy-pie-chart"
 import { useVuelidate } from '@vuelidate/core'
-import { required, email } from '@vuelidate/validators'
+import { required } from '@vuelidate/validators'
 
 
 
@@ -301,7 +317,7 @@ export default {
 
     }
   },
-  methods:{
+  methods:{       
     releaseOrder(index,order){
         if(isEmpty(this.cartItems)){
           App.commit((state) => {      
@@ -324,7 +340,7 @@ export default {
             association.stock = parseFloat(association.stock) + parseFloat((isEmpty(item.quantity)) ? 0 : item.quantity);
           // 
           association.$save();
-          this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);         
+          // this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);         
        }) 
        
        App.commit((state) => {      
@@ -355,9 +371,7 @@ export default {
         }        
     },
     updateEasyPieChart(target,value){
-      let ele = document.querySelector(target);
-      ele.querySelector("canvas").remove();
-      new EasyPieChart(ele, this.easyPieChartOption).update(value);
+      // $(target).data('easyPieChart').update(value)
     },
     payOnline(e){ 
         let  paymentOption = JSON.parse(JSON.stringify(this.razorPayOption));
@@ -387,15 +401,18 @@ export default {
     },
     reset(){
       this.form.customer.name = this.form.customer.phone = this.activeProductId = null
-      App.commit((state) => {   state.activeCustomer = null    })
-      
+      App.commit((state) => {   
+                                state.activeCustomer = null    
+                                //state.cartItems = []
+      })
+      this.onscreenKeyboard()      
     },   
     addToCart(){
       if(this.calculatedPrice <= 0 && ['kg','KG'].includes(this.activeProduct.weight_unit)){
         this.$toast.info("product not added to cart due to  total is 0.")
+        this.activeProductId = null
         return false
-      }
-      console.log(this.activeProduct)
+      }      
       // 
       let cart = {
                     cartId : this.cartItems.length + 1,
@@ -404,7 +421,7 @@ export default {
                     itemName:this.activeProduct.product_name,
                     unit:this.activeProduct.weight_unit,
                     price: (['kg','KG'].includes(this.activeProduct.weight_unit)) ? this.appliedRate : 0,
-                    quantity:(['kg','KG'].includes(this.activeProduct.weight_unit)) ? parseFloat(this.scaleWeight) : 0 ,
+                    quantity:(['kg','KG'].includes(this.activeProduct.weight_unit)) ? parseFloat(this.scaleWeight) : null,
                     total : (['kg','KG'].includes(this.activeProduct.weight_unit)) ? parseFloat(this.calculatedPrice) : 0 , 
                     mask:this.activeProduct.mask
       }
@@ -417,10 +434,13 @@ export default {
         association.stock = parseFloat(association.stock) - parseFloat(cart.quantity);
         association.$save();
         //     
-        this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);
-      }      
+        //this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);
+      }else{
+        this.onscreenKeyboard()
+      }
       //
       this.$toast.success("Product is added to cart !")
+      this.activeProductId = null      
     }, 
     removeFromCart(item){
         //
@@ -431,19 +451,20 @@ export default {
           association.stock = parseFloat(association.stock) + parseFloat((isEmpty(item.quantity)) ? 0 : item.quantity);
         // 
         association.$save();
-        this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);
+        //this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);
         //
         App.commit( (state) => {
           var index = state.cartItems.findIndex(c => c.id == item.id);
           state.cartItems.splice(index, 1);
         })
     },  
-    updateCart(value,event){            
-      let item = this.cartItems.find( cart => cart.cartId == event.target.dataset.cart)
+    updateCart(e){   
+      //
+      let item = this.cartItems.find( cart => cart.cartId == e.target.dataset.cart)
       let product = find(this.products , p => { return p.id == item.id })   
       let association = Association.query().where("product_id",item.id).first();  
 
-      if((value - item.quantity) > association.stock){
+      if((e.target.value - item.quantity) > association.stock){
         this.$toast.error("Quantity out of stock ! Please raise new stock request")
         return false
       }
@@ -453,7 +474,7 @@ export default {
               wholesale = null,
               rate  = 0,
               total  = 0,
-              quantity  = (isEmpty(value)) ? 0 : value;
+              quantity  = (isEmpty(e.target.value)) ? 0 : e.target.value;
           if(!isEmpty(wholesaleInstace)){
             wholesale = find(wholesaleInstace, (w) => { return w.from <= quantity && quantity <= w.to })
           }  
@@ -467,7 +488,7 @@ export default {
                         itemName:item.itemName,
                         unit:item.unit,
                         price: rate,
-                        quantity:(isEmpty(value)) ? '' : quantity,
+                        quantity:(isEmpty(e.target.value)) ? '' : quantity,
                         total : parseFloat(total), 
                         mask: item.mask
           }
@@ -477,12 +498,12 @@ export default {
             state.cartItems[index] = cart
           })
 
-          if(isEmpty(value)){
+          if(isEmpty(e.target.value)){
             if(!isEmpty(item.quantity)){
                           
               association.stock = parseFloat(association.stock) + parseFloat(item.quantity);
               association.$save();
-              this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);        
+              //this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);        
               this.$toast.success("Cart item is updated !")
             }
           }else{               
@@ -493,7 +514,7 @@ export default {
             // 
             association.stock = parseFloat(association.stock) - parseFloat(cart.quantity);
             association.$save();            
-            this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);        
+            //this.updateEasyPieChart(".current-stock-chart-"+association.product_id,(association.stock/association.totalQtyPerDay) * 100);        
             this.$toast.success("Cart item is updated !")
           }
           
@@ -511,10 +532,10 @@ export default {
       })
       this.$toast.success("Customer detail Updated !")  
     },
-    loadCustomer(event) {     
-      if(event.detail.completed){   
-        this.form.customer.phone =  event.target.value;    
-        const customer = Customer.query().where('phone', Number(event.target.value)).first()        
+    loadCustomer(e) { 
+      if(!isEmpty(e.target.value) && e.target.value.length == 10){        
+        this.form.customer.phone =  e.target.value;    
+        const customer = Customer.query().where('phone', Number(e.target.value)).first()        
         if(isEmpty(customer)){
           this.$toast.success("New Customer !")      
         }else{ 
@@ -523,20 +544,24 @@ export default {
             state.activeCustomer = customer.$toJson()
           })
           this.$toast.success("Customer detail loaded !")      
-        }       
+        } 
       }
     },
     saveCustomer() {      
       // 
-      this.form.customer.shop_id = this.shop.id  
-      Customer.insert({ data: this.form.customer })
-      const customer = Customer.query().where('phone', Number(this.form.customer.phone)).first()
-      // 
-      this.activeCustomerName = customer.name      
-      App.commit((state) => {
-        state.activeCustomer = customer.$toJson()
-      })
-      this.$toast.success("Customer Saved !")
+      if(!isEmpty(this.form.customer.phone) && this.form.customer.phone.length == 10){  
+        this.form.customer.shop_id = this.shop.id  
+        Customer.insert({ data: this.form.customer })
+        const customer = Customer.query().where('phone', Number(this.form.customer.phone)).first()
+        // 
+        this.activeCustomerName = customer.name      
+        App.commit((state) => {
+          state.activeCustomer = customer.$toJson()
+        })
+        this.$toast.success("Customer Saved !")
+      }else{
+        this.$toast.error("Invalid customer phone number !")
+      }
     },
     savePayment(razorpayPaymentId){ 
       if(isEmpty(razorpayPaymentId)){
@@ -614,9 +639,6 @@ export default {
               if(isEmpty(totalQtySaleToday)){
                 assoc.totalQtySaleToday = totalQtySaleToday;
               }
-
-              console.log(todaySales)
-              console.log(totalQtySaleToday)
               assoc.$save();
             })
 
@@ -666,6 +688,13 @@ export default {
     // 
     calculatedPrice(){
       if(!isEmpty(this.activeProduct)){        
+        if(isEmpty(this.activeProduct.rate)){
+          this.$toast.error("update today’s rate")
+          this.activeProductId = null
+          return false;
+        }
+
+        
         if(!isEmpty(this.activeProduct.rate) && ['kg','KG'].includes(this.activeProduct.weight_unit)){
           let wholesaleInstace = JSON.parse(this.activeProduct.rate.wholesale_rate),
               wholesale = null,
@@ -688,7 +717,6 @@ export default {
       let products =  Product.query().with(['rate','association']).get()
       return products
     }
-
   },
   setup() {
     return { v$: useVuelidate() }
@@ -700,23 +728,16 @@ export default {
     }
   },
   mounted(){
-    
-    if(!isEmpty(this.activeCustomer))         
-      this.activeCustomerName = this.activeCustomer.name
-   
+      this.initializePie()
+
+      if(!isEmpty(this.activeCustomer))         
+      this.activeCustomerName = this.activeCustomer.name 
       
       
       this.receiveAmount = this.getReceiveAmount
-      //
-      this.products.filter( item => {      
-        let elementStock = document.querySelector(".current-stock-chart-"+item.id);
-        new EasyPieChart(elementStock, this.easyPieChartOption)
-
-        let elementSale = document.querySelector(".current-sale-chart-"+item.id);
-        new EasyPieChart(elementSale, this.easyPieChartOption)            
-      })
-  }
-
-  
+  },
+  beforeMount() {
+    this.onscreenKeyboard()
+  } 
 }
 </script>

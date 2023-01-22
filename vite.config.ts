@@ -4,6 +4,7 @@ import vue from '@vitejs/plugin-vue'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
+import inject from "@rollup/plugin-inject";
 
 rmSync('dist-electron', { recursive: true, force: true })
 
@@ -12,7 +13,14 @@ const isProduction = process.env.NODE_ENV === "production"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  define: {
+    '__APP_VERSION__': JSON.stringify(process.env.npm_package_version),
+  },
   plugins: [
+    inject({   // => that should be first under plugins array
+        $: 'jquery',
+        jQuery: 'jquery',
+    }),
     vue(),
     electron([
       {
