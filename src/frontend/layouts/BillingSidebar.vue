@@ -2,7 +2,8 @@
     <!--Left Part start-->
     <div class="SplitPnl SplitPnl-Left Text--Center">
       <div class="Top-Logo-Part" style="position:relative">
-        <a class="SiteLogo" href="#"><img src="../../assets/img/logo.png" alt=""/></a>        
+        <a class="SiteLogo" href="#"><img src="../../assets/img/logo.png" alt=""/></a>    
+        <kbd style="font-size: 11px;position: absolute; bottom: 33px; right: 20px;">v {{  version  }}</kbd>    
       </div>
       <div class="LeftNav" id="tabs-nav">
         <div class="Child-Item mb--18"><router-link to="/billing" class="Btn-Normal DropShadow--Normal ">{{ $t('Billing') }}</router-link></div>
@@ -31,6 +32,11 @@
      import { mapState  , mapActions} from 'vuex';
      import { App,StockRequests } from "../../models"
      export default {
+          data(){
+                  return {
+                            version : __APP_VERSION__
+                  }
+          },
           computed:{
               ...mapState('coop_local_base/apps', {
                                             locale: (state) => state.locale,
