@@ -4615,3 +4615,20 @@ button[disabled] {
 .start-0 {
   left: 0 !important;
 }
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.product-img{
+  height: 57.08px !important;
+  width: 57.08px !important;
+  border-radius: 4px;
+}
+
+.text-turncate{
+  overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

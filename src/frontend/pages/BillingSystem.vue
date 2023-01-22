@@ -1,10 +1,10 @@
 <template>
   <div id="tab1" class="tab-content Billing-Tab-Content" >
-    <div class="SplitPnl SplitPnl-Middle Text--Center" >
+    <div class="SplitPnl SplitPnl-Middle" >
       <div class="SplitPnl SplitPnl-Middle Text--Center overlay" v-if="isEmpty(this.activeCustomer)"></div>      
       <div class="TopDigitalPnl pt--1 pb--1">
         <div class="Digital-Box Digital--font-color Text--Left">
-          <h5>{{  $t('ItemName') }}</h5>
+          <h5> {{ isEmpty(activeProduct) ? $t('ItemName') : activeProduct.product_name }}</h5>
           <div class="itemName">
             <h4>{{ scaleWeight }}</h4>
             <small>KG</small> 
@@ -21,16 +21,16 @@
         <div class="Bottom-ProductPnl">         
           <div class="MainProductPnl" id="MainProductPnl">
             <div class="Product-Item DropShadow--Normal Overflow--hidden ma--15" :class="{'DropShadow--Active':(activeProductId == product.id)}" v-for="product in products" :key="product.id" @click.prevent="activeProductId = product.id">
-              <div class="Product-Type Product-Type-Top pa--1" style="position:relative">                
+              <div class="Product-Type Product-Type-Top pa--1 Text--" style="position:relative">                
                 <div class="Type-Left" id="MainProduct">                  
-                  <img :src="product.raw_image" class="logo mb--1">
-                  <h4> {{ product.product_name }}</h4>
+                  <img :src="product.raw_image" class="logo mb--1 product-img">
+                  <h4  class="text-turncate"> {{ product.product_name }}</h4>
                 </div>
 
                 <div class="Flip-Box-shadow Main-Flip-Box" :ref="'product-panel-'+product.id">
-                  <div class="Main-chart First-Flip-Box">
+                  <div class="Main-chart First-Flip-Box">                    
                     <CircleProgress
-                      :percent="(product.association.stock/product.association.totalQtyPerDay) * 100"
+                      :percent="isNaN((product.association.stock/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.stock/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -39,11 +39,11 @@
                       :border-bg-width="0"
                     />
                     <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
-                    <span class="Info-Text p--1">{{ $t('Stock') }}</span> 
+                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Stock') }}</span> 
                   </div>
                   <div class="Flip-chart Second-Flip-Box">
-                    <CircleProgress
-                      :percent="(product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
+                    <CircleProgress                      
+                      :percent="isNaN((product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -51,7 +51,7 @@
                       :border-width="3"
                       :border-bg-width="0"
                     />
-                    <span class="Info-Text p--1">{{ $t('Sale') }}</span> 
+                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Sale') }}</span> 
                     <span class="percent">{{ currency(product.association.todaySales) }}</span> 
                   </div>
                 </div>
@@ -735,7 +735,11 @@ export default {
       
       
       this.receiveAmount = this.getReceiveAmount
-  },
+      //
+      $(".Product-Item").hover(function () {
+          $(this).find(".Main-Flip-Box").toggleClass("Active");
+      });
+   },
   beforeMount() {
     this.onscreenKeyboard()
   } 

@@ -2,12 +2,12 @@
   <!--tab2 start-(Stocks Tab)-->
   <div id="tab2" class="tab-content Stocks-Tab-Content"> 
     <!--Left Section start-->
-    <div class="SplitPnl SplitPnl-Middle Text--Center"> 
+    <div class="SplitPnl SplitPnl-Middle"> 
       <!--Top Pannel start-->
       <div class="TitelHr pt--2 pb--2 pl--2 pr--2">
         <h3>{{ $t('Stock') }}</h3>
-        <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Dark-Green pl--2 pr--2 ml--18" id="NewRequest" @click.prevent="currentStockTab=false;newStockTab=true;">{{ $t('NewStockRequest') }}</a> 
-        <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Red BackBtn pl--2 pr--2" id="NewRequestBack" @click.prevent="currentStockTab=true;newStockTab=false" v-if="newStockTab"><img src="../../assets/img/red_arrow.png" alt="" class="backIcon">{{ $t('ReturnBack') }}</a> 
+        <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Dark-Green pl--2 pr--2 ml--18" id="NewRequest" @click.prevent="currentStockTab=false;newStockTab=true;addFlipStockSale()">{{ $t('NewStockRequest') }}</a> 
+        <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Red BackBtn pl--2 pr--2" id="NewRequestBack" @click.prevent="currentStockTab=true;newStockTab=false;addFlipStockSale()" v-if="newStockTab"><img src="../../assets/img/red_arrow.png" alt="" class="backIcon">{{ $t('ReturnBack') }}</a> 
       </div>
       <!--Top Pannel end--> 
       <!--Middle Pannel start-->
@@ -18,13 +18,13 @@
             <!--Product Item-->
             <div class="Product-Item-Stock DropShadow--Normal Overflow--hidden ma--15" v-for="product in products" :key="product.id">
               <div class="Product-Type Product-Type-Top pa--1" >
-                <div class="Type-Left " id="MainProduct"> <img :src="product.raw_image" class="logo mb--1">
-                  <h4>{{ product.product_name }}</h4>
+                <div class="Type-Left text-left" id="MainProduct"> <img :src="product.raw_image" class="logo mb--1 product-img">
+                  <h4 class="text-turncate">{{ product.product_name }}</h4>
                 </div>
-                <div class="Flip-Box-shadow Main-Flip-Box" :ref="'product-panel-'+product.id" @click="this.$refs['product-panel-'+product.id][0].classList.toggle('Active')">
+                <div class="Flip-Box-shadow Main-Flip-Box Text--center" :ref="'product-panel-'+product.id" >
                   <div class="Main-chart" >
-                    <CircleProgress
-                      :percent="(product.association.stock/product.association.totalQtyPerDay) * 100"
+                    <CircleProgress                      
+                      :percent="isNaN((product.association.stock/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.stock/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -33,11 +33,11 @@
                       :border-bg-width="0"
                     />
                     <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
-                    <span class="Info-Text p--1">{{ $t('Stock') }}</span> 
+                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Stock') }}</span> 
                   </div>
                   <div class="Flip-chart" >
                     <CircleProgress
-                      :percent="(product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
+                      :percent="isNaN((product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -45,7 +45,7 @@
                       :border-width="3"
                       :border-bg-width="0"
                     />
-                    <span class="Info-Text p--1">{{ $t('Sale') }}</span> 
+                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Sale') }}</span> 
                     <span class="percent" >{{ currency(product.association.todaySales) }}</span> 
                   </div>
                 </div>
@@ -82,13 +82,13 @@
           <!--Product Item-->
           <div class="Product-Item-Stock DropShadow--Normal Overflow--hidden ma--15"  v-for="product in newStockRequest" :key="product.id">
             <div class="Product-Type Product-Type-Top pa--1" >
-              <div class="Type-Left" id="MainProduct"> <img :src="product.raw_image" class="logo mb--1">
-                <h4>{{ product.product_name }}</h4>
+              <div class="Type-Left" id="MainProduct"> <img :src="product.raw_image" class="logo mb--1 product-img">
+                <h4  class="text-turncate">{{ product.product_name }}</h4>
               </div>
-              <div class="Flip-Box-shadow Main-Flip-Box" :ref="'new-product-panel-'+product.id" @click="this.$refs['new-product-panel-'+product.id][0].classList.toggle('Active')">
+              <div class="Flip-Box-shadow Main-Flip-Box" :ref="'new-product-panel-'+product.id" >
                 <div class="Main-chart">
                   <CircleProgress
-                      :percent="(product.association.stock/product.association.totalQtyPerDay) * 100"
+                      :percent="isNaN((product.association.stock/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.stock/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -96,12 +96,12 @@
                       :border-width="3"
                       :border-bg-width="0"
                     />
-                  <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
-                  <span class="Info-Text p--1">{{ $t('Stock') }}</span> 
+                  <span class="percent   text-center w-100 d-block">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
+                  <span class="Info-Text p--1   text-center w-100 d-block">{{ $t('Stock') }}</span> 
                 </div>
                 <div class="Flip-chart">
-                  <CircleProgress
-                      :percent="(product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
+                  <CircleProgress                      
+                      :percent="isNaN((product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
                       :size="89"
                       :viewport="true"
                       :transition="2000"    
@@ -109,7 +109,7 @@
                       :border-width="3"
                       :border-bg-width="0"
                     />
-                  <span class="Info-Text p--1">{{ $t('Sale') }}</span> 
+                  <span class="Info-Text p--1   text-center w-100 d-block">{{ $t('Sale') }}</span> 
                   <span class="percent" >{{ currency(product.association.todaySales) }}</span> 
                 </div>
               </div>
@@ -168,27 +168,33 @@
                       </thead>
                       <tbody>
                         <tr v-for="(rp,index) in sr.requested_products" :key="rp.id">
-                          <td>{{ rp.product.product_name }} </td>
-                          <td style="padding:0" v-if="['Requested','Approved'].includes(sr.status)">
-                            <div class="Inputflex">
-                              <template v-if="sr.editMode && rp.status != 'Cancelled'">
-                                <input v-model="rp.stock_request"  @input="rp.total = parseFloat(rp.supply_rate) * parseFloat(rp.stock_request); rp.$save()"  class="inputStyle Edit-Qty Act  keyboard-numpad" :data-pattern="(rp.product.mask == '#*')  ? 'number' : 'decimal'" placeholder="0"  />
-                                <span class="currency">{{ rp.product.weight_unit }}</span> 
-                              </template>
-                              <template v-else>
-                                <span class="">{{ rp.stock_request +' '+ rp.product.weight_unit }}</span>
-                              </template>                            
-                            </div>
-                          </td>
-                          <td v-else>
-                              {{  ((sr.type == 'Direct') ? rp.stock_sent : rp.stock_request) +' '+ rp.product.weight_unit }}
-                          </td>
-                          <!--<td><input class="Edit-Expense-Price inputStyle" name="" type="text" value="150" disabled="disabled"></td>-->
-                          <td v-if="sr.status == 'Requested'">{{ $t('Awaiting') }}</td>
-                          <td v-else>{{ currency(rp.supply_rate) }} / {{ rp.product.weight_unit }}</td>
-                          <td>{{ rp.status }}</td>
-                          <td><a href="javascript:void(0);" class="action-Btn-Normal Del-Tbl-Row DropShadow--Normal" v-if="rp.status == 'Requested'" @click="cancelledRequestItem(sr,rp)"><img src="../../assets/img/delete.svg" class="Icon" alt=""></a></td>
-                          <td style="padding:0">{{ currency(rp.total) }}</td>
+                          <template v-if="isEmpty(rp.product)">
+                              <td>{{ rp.stock_request_id   }} - {{ rp.product_id}}</td>
+                              <td colspan="5"> -  Null </td>
+                          </template>
+                          <template v-else>
+                              <td>{{ rp.product.product_name }} </td>
+                              <td style="padding:0" v-if="['Requested','Approved'].includes(sr.status)">
+                                <div class="Inputflex">
+                                  <template v-if="sr.editMode && rp.status != 'Cancelled'">
+                                    <input v-model="rp.stock_request"  @input="rp.total = parseFloat(rp.supply_rate) * parseFloat(rp.stock_request); rp.$save()"  class="inputStyle Edit-Qty Act  keyboard-numpad" :data-pattern="(rp.product.mask == '#*')  ? 'number' : 'decimal'" placeholder="0"  />
+                                    <span class="currency">{{ rp.product.weight_unit }}</span> 
+                                  </template>
+                                  <template v-else>
+                                    <span class="">{{ rp.stock_request +' '+ rp.product.weight_unit }}</span>
+                                  </template>                            
+                                </div>
+                              </td>
+                              <td v-else>
+                                  {{  ((sr.type == 'Direct') ? rp.stock_sent : rp.stock_request) +' '+ rp.product.weight_unit }}
+                              </td>
+                              <!--<td><input class="Edit-Expense-Price inputStyle" name="" type="text" value="150" disabled="disabled"></td>-->
+                              <td v-if="sr.status == 'Requested'">{{ $t('Awaiting') }}</td>
+                              <td v-else>{{ currency(rp.supply_rate) }} / {{ rp.product.weight_unit }}</td>
+                              <td>{{ rp.status }}</td>
+                              <td><a href="javascript:void(0);" class="action-Btn-Normal Del-Tbl-Row DropShadow--Normal" v-if="rp.status == 'Requested'" @click="cancelledRequestItem(sr,rp)"><img src="../../assets/img/delete.svg" class="Icon" alt=""></a></td>
+                              <td style="padding:0">{{ currency(rp.total) }}</td>
+                          </template>                          
                         </tr>                            
                       </tbody>
                     </table>
@@ -482,6 +488,11 @@ export default {
                         this.currentStockTab = true 
                         this.newStockTab = false
                         this.$toast.success("Stock Request Sent");
+          },
+          addFlipStockSale(){
+            $(".Product-Item-Stock").hover(function () {
+                $(this).find(".Main-Flip-Box").toggleClass("Active");
+            });
           }
   },
   computed:{
@@ -507,13 +518,17 @@ export default {
   mounted(){                           
             this.products.filter( item => {
                                               item.requested_stock = null;
-                                              this.newStockRequest.push(pick(item,['id','weight_unit','wholesale_weight_range','stock','status','supplier_id','requested_stock','product_name','image','mask','association','digits']))
+                                              this.newStockRequest.push(pick(item,['id','weight_unit','wholesale_weight_range','stock','status','supplier_id','requested_stock','product_name','image','mask','association','digits','raw_image']))
             })
 
             // 
 
+
             let stockRequestsMap = StockRequests.query().where('status', (value) => value != 'Completed').with('requested_products.product').get()
-            stockRequestsMap.forEach( sr => { sr.notify = false; sr.$save(); })         
+            stockRequestsMap.forEach( sr => { sr.notify = false; sr.$save(); })  
+            
+            
+            this.addFlipStockSale()
   }
 }
 </script>
