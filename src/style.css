@@ -444,6 +444,7 @@ h6 {
 	width:16em;
 	border-radius:0.6em;
 	float:left;
+  margin-bottom: 15px;
 }
 .Product-Item-Stock {
 	width:16em;
@@ -4632,3 +4633,33 @@ button[disabled] {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+
+
+.AddItemBtn {
+	width:100%;
+	height:3.50em;
+	line-height:3.50em;
+	font-size:0.95em;
+	border-radius:0.6em;
+	color:#fff;
+	display:inline-block;
+	font-weight:300;
+	text-align:center;
+}
+
+
+.Product-ItemWrap {
+	width:16em;
+	float:left;
+	min-height:17.2em;
+	margin-bottom:0.30em;
+}
+.Product-ItemWrap.AddMargin {}
+
+
+.Product-Item {
+	width:16em;
+	border-radius:0.6em;
+	float:left;
+}
+.Product-ItemWrap .Product-Item {}

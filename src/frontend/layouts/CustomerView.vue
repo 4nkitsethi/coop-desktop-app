@@ -2,13 +2,13 @@
   <div id="" class="CF-tab-content Customer-Facing-Tab-Content"> 
     <!--Middle Part-->
     <div class="SplitPnl SplitPnl-Middle Text--Center"> 
-      
+     
       <!--Middle Top Part-->
       <div class="TopDigitalPnl Customer-Facing-Top pt--1 pb--1">
-        <div class="TopPnlLft"> <a href="javascript:void(0);" class="logo"><img src="../../assets/img/logo.png" alt=""> </a>
-          <div class="account_info">
+        <div class="TopPnlLft"> <a href="javascript:void(0);" class="logo py-4"><img src="../../assets/img/logo.png" alt=""> </a>
+          <div class="account_info" v-if="!isEmpty(activeCustomer)">
             <h4>Hello</h4>
-            <h5>Mr. Arijit</h5>
+            <h5>{{  activeCustomer.name }} </h5>
           </div>
         </div>
         <div class="Digital-Box Digital--font-color Text--Left">
@@ -27,7 +27,7 @@
               <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Lang-Btn" :class="{'Active':($i18n.locale=='ka')}"  @click.prevent="updateLocale('en')" v-else>EN / <span>KA</span></a>
             </div>
           </div>
-          <button class="Btn-Normal DropShadow--Normal logoutBtn"><img src="../../assets/img/logout_icon.svg" alt=""></button>
+          <router-link to="/" class="Btn-Normal DropShadow--Normal logoutBtn">{{ 'Back' }}</router-link>
         </div>
       </div>
       <!--Middle Middle Part-->
@@ -49,35 +49,17 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><p>Layer</p></td>
-                    <td>&#8377; 105.00/kg</td>
-                    <td><p>5.59 Kg</p></td>
-                    <td class="w--24"><p>&#8377; 670.80</p></td>
-                  </tr>
-                  <tr>
-                    <td><p>Layer</p></td>
-                    <td>&#8377; 105.00/kg</td>
-                    <td><p>5.59 Kg</p></td>
-                    <td class="w--24"><p>&#8377; 670.80</p></td>
-                  </tr>
-                  <tr>
-                    <td><p>Layer</p></td>
-                    <td>&#8377; 105.00/kg</td>
-                    <td><p>5.59 Kg</p></td>
-                    <td class="w--24"><p>&#8377; 670.80</p></td>
-                  </tr>
-                  <tr>
-                    <td><p>Layer</p></td>
-                    <td>&#8377; 105.00/kg</td>
-                    <td><p>5.59 Kg</p></td>
-                    <td class="w--24"><p>&#8377; 670.80</p></td>
+                  <tr v-for="cart in cartItems">
+                    <td>{{ cart.itemName }}</td>
+                    <td>{{ currency(cart.price) }}</td>
+                    <td>{{ ((['',null].includes(cart.quantity)) ? 0 : cart.quantity) +' '+ cart.unit}}</td>
+                    <td class="w--24"><p>{{ currency(cart.total)}}</p></td>
                   </tr>
                 </tbody>
                 <tfoot>
                   <tr>
                     <td colspan="3"><strong>Total</strong></td>
-                    <td class="w--24"><strong>&#8377; 4024.80</strong></td>
+                    <td class="w--24"><strong>{{ currency(sumBy(cartItems,'total')) }}</strong></td>
                   </tr>
                   <tr class="Pending-Amt-Row">
                     <td colspan="3" class="Text--Red"><strong>{{ $t('PendingAmount') }}</strong></td>
@@ -246,7 +228,19 @@
 
 <script>
 import { mapState } from 'vuex';
+import { isEmpty,sumBy } from 'lodash'
+import { currency } from '../../utils/currency';
+import { App } from "../../models"
+
  export default {
+                  props:['customerView'],
+                  data(){
+                          return {
+                                    currency,
+                                    isEmpty,
+                                    sumBy
+                          }
+                  },
                   methods:{
                             updateLocale(lang){
                                 this.$i18n.locale = lang

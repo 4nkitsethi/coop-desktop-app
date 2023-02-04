@@ -1,6 +1,6 @@
 {
   "name": "coop",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "main": "dist-electron/main/index.js",
   "description": "COOP Chicken Hub",
   "author": "white-space <coop@white-space.in>",

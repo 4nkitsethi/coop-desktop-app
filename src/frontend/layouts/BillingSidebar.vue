@@ -5,7 +5,7 @@
         <a class="SiteLogo" href="#"><img src="../../assets/img/logo.png" alt=""/></a>    
         <kbd style="font-size: 11px;position: absolute; bottom: 33px; right: 20px;">v {{  version  }}</kbd>    
       </div>
-      <div class="LeftNav" id="tabs-nav">
+      <div class="LeftNav" id="tabs-nav">        
         <div class="Child-Item mb--18"><router-link to="/billing" class="Btn-Normal DropShadow--Normal ">{{ $t('Billing') }}</router-link></div>
         <div class="Child-Item mb--18"><router-link to="/stocks" class="Btn-Normal DropShadow--Normal">{{ $t('Stock',2) }}</router-link><Icon icon="carbon:notification-filled" class="Stock-Notification" v-if="isStockNotify > 0"/></div>
         <div class="Child-Item mb--18"><router-link to="/customers" class="Btn-Normal DropShadow--Normal">{{ $t('CustomerLabel',2) }}</router-link></div>
@@ -22,6 +22,7 @@
         <!--<div class="indicator">Online</div>--> 
         <img class="Working-Btn Online-Btn" src="../../assets/img/OnlineIcon.png" alt="" v-if="navigator"/> 
         <img class="Working-Btn Offline-Btn" src="../../assets/img/OfflineIcon.png" alt="" v-else/> 
+        <kbd style="font-size: 10px; position: absolute; bottom: 2px;" id="downloadStatus">10 / 100</kbd>
       </div>
       <!--LeftBottom Part--> 
     </div>

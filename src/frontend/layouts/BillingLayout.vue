@@ -91,6 +91,7 @@
     
         computed: {        
             isCustomerView(){
+                console.log(this.$route.meta.customerView);
                 return  this.$route.meta.customerView;
             },
             ...mapState('coop_local_base/apps', {

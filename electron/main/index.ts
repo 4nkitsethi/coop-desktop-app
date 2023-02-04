@@ -42,6 +42,7 @@ let win: BrowserWindow | null = null
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
+const index2Html = join(process.env.DIST, 'index2.html')
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -135,6 +136,17 @@ app.on('activate', () => {
   }
 })
 
+ipcMain.on("openChildWindow", (event, arg) => {
+  let childWindow = new BrowserWindow({
+    webPreferences: {
+      preload,
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  })
+  childWindow.loadURL(indexHtml)
+});
+
 // New window example arg: new windows url
 ipcMain.handle('open-win', (_, arg) => {
   const childWindow = new BrowserWindow({
@@ -195,8 +207,8 @@ autoUpdater.on('error', (error) => {
 })
 
 autoUpdater.on('download-progress', (progressObj) => {  
-  win.webContents.send('message',{
-    status: 'downloading',
+  win.webContents.send('version-update',{
+    status: 'downloading ...',
     download: {
       bytesPerSecond: progressObj.bytesPerSecond,
       percent: progressObj.percent,

@@ -5,6 +5,8 @@ import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
 import inject from "@rollup/plugin-inject";
+// vite.config.js
+import { resolve } from 'path'
 
 rmSync('dist-electron', { recursive: true, force: true })
 
@@ -39,7 +41,7 @@ export default defineConfig({
             minify: isProduction,
             outDir: 'dist-electron/main',
             rollupOptions: {
-              external: Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
+              external: Object.keys("dependencies" in pkg ? pkg.dependencies : {})
             },
           },
         },
@@ -57,7 +59,7 @@ export default defineConfig({
             minify: isProduction,
             outDir: 'dist-electron/preload',
             rollupOptions: {
-              external: Object.keys("dependencies" in pkg ? pkg.dependencies : {}),
+              external: Object.keys("dependencies" in pkg ? pkg.dependencies : {})
             },
           },
         },

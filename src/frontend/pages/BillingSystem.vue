@@ -17,73 +17,78 @@
         <div class="Top-Breadcrumb pl--24 pr--24 pt--half pb--half">
           <span class="pr--3">{{ $t('ChooseItem', 2) }}</span>
           <span class="Item-Name Text--Yellow">{{ isEmpty(activeProduct) ? '' : activeProduct.product_name }}</span>
+          <!-- <router-link to="/customer-view" style="color:#bf8a00;margin-left:auto">{{ 'Customer View' }}</router-link>           -->
         </div>
         <div class="Bottom-ProductPnl">         
           <div class="MainProductPnl" id="MainProductPnl">
-            <div class="Product-Item DropShadow--Normal Overflow--hidden ma--15" :class="{'DropShadow--Active':(activeProductId == product.id)}" v-for="product in products" :key="product.id" @click.prevent="activeProductId = product.id">
-              <div class="Product-Type Product-Type-Top pa--1 Text--" style="position:relative">                
-                <div class="Type-Left" id="MainProduct">                  
-                  <img :src="product.raw_image" class="logo mb--1 product-img">
-                  <h4  class="text-turncate"> {{ product.product_name }}</h4>
-                </div>
+            <div class="Product-ItemWrap ma--15" v-for="product in products" :key="product.id" >
+              <div class="Product-Item DropShadow--Normal Overflow--hidden" :class="{'DropShadow--Active':(activeProductId == product.id)}" @click.prevent="activeProductId = product.id">
+                <div class="Product-Type Product-Type-Top pa--1 Text--" style="position:relative">                
+                  <div class="Type-Left" id="MainProduct">                  
+                    <img :src="product.raw_image" class="logo mb--1 product-img">
+                    <h4  class="text-turncate"> {{ product.product_name }}</h4>
+                  </div>
 
-                <div class="Flip-Box-shadow Main-Flip-Box" :ref="'product-panel-'+product.id">
-                  <div class="Main-chart First-Flip-Box">                    
-                    <CircleProgress
-                      :percent="isNaN((product.association.stock/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.stock/product.association.totalQtyPerDay) * 100"
-                      :size="89"
-                      :viewport="true"
-                      :transition="2000"    
-                      :fill-color="'#bf8a00'"
-                      :border-width="3"
-                      :border-bg-width="0"
-                    />
-                    <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
-                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Stock') }}</span> 
-                  </div>
-                  <div class="Flip-chart Second-Flip-Box">
-                    <CircleProgress                      
-                      :percent="isNaN((product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
-                      :size="89"
-                      :viewport="true"
-                      :transition="2000"    
-                      :fill-color="'#bf8a00'"
-                      :border-width="3"
-                      :border-bg-width="0"
-                    />
-                    <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Sale') }}</span> 
-                    <span class="percent">{{ currency(product.association.todaySales) }}</span> 
-                  </div>
-                </div>
-              </div>
-              <div class="Product-Type Product-Dtls Box--inline-shadow pa--1" id="MainProduct">                
-                <template v-if="!isEmpty(product.rate)">                    
-                  <template v-if="(JSON.parse(product.rate.wholesale_rate).length > 0)">
-                    <div class="Btm-Dtls-txt">                  
-                      <p class="Text--Yellow Text--Uppercase">{{ $t('Wholesale') }}</p>
-                      <p>{{ currency(head(JSON.parse(product.rate.wholesale_rate)).rate) }}</p>
+                  <div class="Flip-Box-shadow Main-Flip-Box" :data-ref="'product-panel-'+product.id" :ref="'product-panel-'+product.id">
+                    <div class="Main-chart First-Flip-Box">                    
+                      <CircleProgress
+                        :percent="isNaN((product.association.stock/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.stock/product.association.totalQtyPerDay) * 100"
+                        :size="89"
+                        :viewport="true"
+                        :transition="2000"    
+                        :fill-color="'#bf8a00'"
+                        :border-width="3"
+                        :border-bg-width="0"
+                      />
+                      <span class="percent">{{ scale(product.association.stock,product.digits) }} <small>{{ product.weight_unit  }}</small></span> 
+                      <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Stock') }}</span> 
                     </div>
+                    <div class="Flip-chart Second-Flip-Box">
+                      <CircleProgress                      
+                        :percent="isNaN((product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100) ? 0 : (product.association.totalQtySaleToday/product.association.totalQtyPerDay) * 100"
+                        :size="89 "
+                        :viewport="true"
+                        :transition="2000"    
+                        :fill-color="'#bf8a00'"
+                        :border-width="3"
+                        :border-bg-width="0"
+                      />
+                      <span class="Info-Text p--1  text-center w-100 d-block">{{ $t('Sale') }}</span> 
+                      <span class="percent">{{ currency(product.association.todaySales) }}</span> 
+                    </div>
+                  </div>
+                </div>
+                <div class="Product-Type Product-Dtls Box--inline-shadow pa--1" id="MainProduct">                
+                  <template v-if="!isEmpty(product.rate)">                    
+                    <template v-if="(JSON.parse(product.rate.wholesale_rate).length > 0)">
+                      <div class="Btm-Dtls-txt">                  
+                        <p class="Text--Yellow Text--Uppercase">{{ $t('Wholesale') }}</p>
+                        <p>{{ currency(head(JSON.parse(product.rate.wholesale_rate)).rate) }}</p>
+                      </div>
+                    </template>
                   </template>
-                </template>
-                <!--  -->
-                <div class="Btm-Dtls-txt">
-                  <p class="Text--Yellow Text--Uppercase">{{ $t('Retail') }}</p>
-                  <template v-if="isEmpty(product.rate)">
-                    <p>{{ currency(0) }}</p>
-                  </template>
-                  <template v-else>
-                      <p>{{ currency(product.rate.retail_rate) }}</p>                                    
-                  </template>
+                  <!--  -->
+                  <div class="Btm-Dtls-txt">
+                    <p class="Text--Yellow Text--Uppercase">{{ $t('Retail') }}</p>
+                    <template v-if="isEmpty(product.rate)">
+                      <p>{{ currency(0) }}</p>
+                    </template>
+                    <template v-else>
+                        <p>{{ currency(product.rate.retail_rate) }}</p>                                    
+                    </template>
+                  </div>
                 </div>
               </div>
+              <template v-if="!isEmpty(activeProduct)">
+                <a href="javascript:void(0)" class="Btn-Normal DropShadow--Normal AddItemBtn" v-if="activeProduct.id == product.id" @click.prevent="addToCart">Add</a>
+              </template>
             </div>
           </div>
         </div>
       </div>
       <!--Middle Pannel end-->
       <!--Bottom Pannel start-->
-      <div class="BottomBtnPnl Text--Left pt--1 pb--1 pl--24 pr--24" v-if="this.activeCustomer != null">
-        <a id="Select-Product-Btn" href="javascript:void(0);"  class="Btn-Normal DropShadow--Normal DropShadow--Active Active--BG mr--2 Text--Green" v-if="!isEmpty(activeProduct)" @click.prevent="addToCart">{{ $t('Ok') }}</a>
+      <div class="BottomBtnPnl Text--Left pt--1 pb--1 pl--24 pr--24" v-if="this.activeCustomer != null">        
         <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Red BackBtn" id="Back-To-Main-Product" @click.prevent="generateBillFLag = false" v-show="generateBillFLag"><img src="../../assets/img/red_arrow.png" alt="" class="backIcon"> {{ $t('Back') }}</a> 
         <a href="javascript:void(0);" class="Btn-Normal DropShadow--Normal Text--Red BackBtn" id="Back-To-Main-Product" @click.prevent="reset" v-show="!generateBillFLag"><img src="../../assets/img/red_arrow.png" alt="" class="backIcon"> {{ $t('New') }}</a>
       </div>
@@ -279,6 +284,7 @@ import { Product, Customer, App, Sale, PurchaseHistory, Association } from "../.
 import moment from "moment"
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
+import { format } from "path";
 
 
 
@@ -364,6 +370,9 @@ export default {
     },
     calculateGrandTotal(flag){
         this.clearDues = flag
+        App.commit((state) => {
+          state.clearDues = flag
+        })
         if(flag){
           this.receiveAmount = parseFloat(sumBy(this.cartItems,'total')) + parseFloat(this.getDueAmount)
         }else{
@@ -650,6 +659,14 @@ export default {
             })
           }, 2000)
       })  
+    },
+    customerView(){
+      const ipc = window.require('electron').ipcRenderer;
+      
+      // Make sure to do ipc.send('some String'), 
+      // where 'some String' must be same with 
+      // the first parameter of ipcMain.on() in app.js 
+      ipc.send('openChildWindow');  
     }
   },
   computed:{
@@ -714,7 +731,9 @@ export default {
       return find(this.products, (p) => { return p.id == this.activeProductId })    
     },      
     products () {
-      let products =  Product.query().with(['rate','association']).get()
+      let products =  Product.query().with('rate', (query) => {
+                                                                  query.where('date', moment().format('Y-MM-DD'))
+                      }).with('association').get()
       return products
     }
   },
@@ -739,6 +758,8 @@ export default {
       $(".Product-Item").hover(function () {
           $(this).find(".Main-Flip-Box").toggleClass("Active");
       });
+
+      console.log(this.$refs['product-panel-6'][0].clientWidth)
    },
   beforeMount() {
     this.onscreenKeyboard()

@@ -14,11 +14,10 @@
     <script type="module" src="/src/dists/js/jquery.keyboard.extension-typing.min.js"></script>    
 
     <script type="text/javascript">
-        const { ipcRenderer } = require("electron")
-    
+        const { ipcRenderer } = require("electron")    
         ipcRenderer.on("message", function (event, data) {
             console.log(data);
-        });
+        });        
     </script>
   </body>
 </html>
