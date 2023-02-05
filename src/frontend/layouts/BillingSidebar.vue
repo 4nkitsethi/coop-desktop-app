@@ -22,7 +22,7 @@
         <!--<div class="indicator">Online</div>--> 
         <img class="Working-Btn Online-Btn" src="../../assets/img/OnlineIcon.png" alt="" v-if="navigator"/> 
         <img class="Working-Btn Offline-Btn" src="../../assets/img/OfflineIcon.png" alt="" v-else/> 
-        <kbd style="font-size: 10px; position: absolute; bottom: 2px;" id="downloadStatus">10 / 100</kbd>
+        <!-- <kbd style="font-size: 10px; position: absolute; bottom: 2px;" id="downloadStatus">10 / 100</kbd> -->
       </div>
       <!--LeftBottom Part--> 
     </div>
