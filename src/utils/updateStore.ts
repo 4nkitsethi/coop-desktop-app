@@ -14,20 +14,24 @@ function updateProductAndRate(){
                 let products = response.data 
                 forEach(products , product =>{                                  
                     let storeProduct = Product.find(product.id)      
-                    if(!moment(storeProduct.updated_at).isSame(product.updated_at)){
-                        Product.update({
-                            where: product.id,
-                            data: omit(product,['rate','association'])
-                        })
-                    }
-
-                    if(!isEmpty(product.rate)){
-                        let storeProductRate = Rate.find(product.rate.id)
-                        if(isEmpty(storeProductRate)){
-                            Rate.query().where('product_id', product.id).delete()
-                            Rate.insert({ data : product.rate })
+                    if(!isEmpty(storeProduct)){
+                        if(!moment(storeProduct.updated_at).isSame(product.updated_at)){
+                            Product.update({
+                                where: product.id,
+                                data: omit(product,['rate','association'])
+                            })
                         }
-                    }
+    
+                        if(!isEmpty(product.rate)){
+                            let storeProductRate = Rate.find(product.rate.id)
+                            if(isEmpty(storeProductRate)){
+                                Rate.query().where('product_id', product.id).delete()
+                                Rate.insert({ data : product.rate })
+                            }
+                        }
+                    }else{
+                        Product.insert({ data : product })
+                    }                    
                 })               
             })
             .catch( err => {
