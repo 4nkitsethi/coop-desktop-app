@@ -15,6 +15,7 @@ class Rate extends Model {
                 supply_rate : this.number(null),
                 whole_sale_rate : this.number(null),
                 wholesale_rate : this.string(null),
+                addons : this.string(null),
                 retail_rate : this.number(null),
                 other_rate : this.number(null),
                 type : this.string(null),

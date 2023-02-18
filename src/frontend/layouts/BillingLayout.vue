@@ -9,15 +9,27 @@
                     <tr>
                         <th class="quantity">Q.</th>
                         <th class="description">Description</th>
-                        <th class="price">₹</th>
+                        <th width="60">₹</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item in history.sales" :key="item.id">
                         <td class="quantity">{{ item.quantity }}</td>
                         <td class="description">{{ item.product.product_name }}</td>
-                        <td class="price">{{ currency(item.total )}}</td>
+                        <td>{{ currency(item.total )}}</td>
                     </tr>
+                
+                    <template v-for="cartItem in cartItems" :key="cartItem.id">
+                        <template v-for="(addon,index) in cartItem.addons" :key="index">
+                            <template v-if="addon.active">
+                                <tr>
+                                    <td colspan="2">{{ cartItem.itemName }} - {{ addon.addon }}</td>
+                                    <td> {{ currency(addon.rate) }}</td>
+                                </tr>
+                            </template>
+                        </template>                            
+                    </template>
+                    
                     <tr>
                         <td class="quantity"></td>
                         <td class="description">TOTAL</td>

@@ -24,7 +24,7 @@ import { head } from "lodash"
 
 //console.log(App.state.baseURL)
 
-axios.defaults.baseURL = "https://coop-chicken.in/api/";
+axios.defaults.baseURL = "http://localhost:8000/api/";
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 import $ from 'jquery';
 window.$ = $;

@@ -22,7 +22,7 @@
         <div class="Bottom-ProductPnl">         
           <div class="MainProductPnl" id="MainProductPnl">
             <div class="Product-ItemWrap ma--15" v-for="product in products" :key="product.id" >
-              <div class="Product-Item DropShadow--Normal Overflow--hidden" :class="{'DropShadow--Active':(activeProductId == product.id)}" @click.prevent="activeProductId = product.id">
+              <div class="Product-Item DropShadow--Normal Overflow--hidden" :class="{'DropShadow--Active':(activeProductId == product.id)}" @click.prevent="setActiveProductId(product.id)">
                 <div class="Product-Type Product-Type-Top pa--1 Text--" style="position:relative">                
                   <div class="Type-Left" id="MainProduct">                  
                     <img :src="product.raw_image" class="logo mb--1 product-img">
@@ -157,16 +157,25 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr v-for="cart in cartItems" :key="cart.cartId">
-                        <td>{{ cart.itemName }} <input type="text" :data-cart="cart.cartId" @input="updateCart"  placeholder="0" class="text-center ChooseQty DropShadow--Normal keyboard-numpad" v-if="!['kg','KG'].includes(cart.unit)" @click="onscreenKeyboard"  :value="cart.quantity" data-pattern="number"/></td>
-                        <td>{{ ((['',null].includes(cart.quantity)) ? 0 : cart.quantity) +' '+ cart.unit}}</td>
-                        <td>{{ currency(cart.total) }}</td>
-                        <td>
-                          <a href="javascript:void(0);" class="action-Btn-Normal Del-Tbl-Data DropShadow--Normal" @click="removeFromCart(cart)">
-                            <img src="../../assets/img/delete.svg" class="Icon" alt="">
-                          </a>
-                        </td>
-                      </tr>
+                      <template v-for="(cart,cartIndex) in cartItems" :key="cart.cartId">
+                        <tr >
+                          <td>{{ cart.itemName }} <input type="text" :data-cart="cart.cartId" @input="updateCart"  placeholder="0" class="text-center ChooseQty DropShadow--Normal keyboard-numpad" v-if="!['kg','KG'].includes(cart.unit)" @click="onscreenKeyboard"  :value="cart.quantity" data-pattern="number"/></td>
+                          <td>{{ ((['',null].includes(cart.quantity)) ? 0 : cart.quantity) +' '+ cart.unit}}</td>
+                          <td>{{ currency(cart.total) }}</td>
+                          <td>
+                            <a href="javascript:void(0);" class="action-Btn-Normal Del-Tbl-Data DropShadow--Normal" @click="removeFromCart(cart)">
+                              <img src="../../assets/img/delete.svg" class="Icon" alt="">
+                            </a>
+                          </td>                        
+                        </tr>
+                        <tr v-if="!isEmpty(cart.addons)">
+                          <td colspan="4">
+                            <div class="addon">                    
+                                <a href="javascript:void(0);" id="Pending-Btn"  class="addon-item DropShadow--Normal" :class="{'active':addon.active}" v-for="(addon,index) in cart.addons" :key="index" @click="updateCartAddon(cartIndex,index)" > {{ addon.addon }} : {{ currency(addon.rate)}}</a> 
+                            </div>
+                          </td>
+                        </tr>
+                      </template>                      
                     </tbody>
                   </table>
                 </div>
@@ -176,7 +185,7 @@
                   <ul>
                     <li class="pl--24 pr--24 pt--23 pb--23">
                       <label>{{ $t('TotalAmount') }}</label>
-                      {{ currency(sumBy(cartItems,'total')) }}
+                      {{ currency(sumBy(cartItems, (item) => { return parseFloat(item.total) })) }}
                     </li>
                   </ul>
                 </div>
@@ -189,7 +198,7 @@
                     <ul>
                       <li class="pl--24 pr--24 pt--23 pb--23">
                         <label>{{ $t('TotalAmount') }}</label>
-                        {{ currency(sumBy(cartItems,'total')) }}
+                        {{ currency(sumBy(cartItems, (item) => { return parseFloat(item.total) })) }}
                       </li>
                       <li class="pl--24 pr--24 pt--23 pb--23">
                         <label>{{ $t('ReceivingAmount') }}</label>
@@ -211,7 +220,7 @@
                   <a href="javascript:void(0);" id="Round-Off-Btn" class="tableBtnArea-Btn-Normal DropShadow--Normal" :class="{'DropShadow--Active' : (paymentType == 'Round Off')}" @click="paymentType = 'Round Off'" >{{ $t('RoundOff') }}</a> 
                   <a href="javascript:void(0);" id="Discount-Btn" class="tableBtnArea-Btn-Normal DropShadow--Normal" :class="{'DropShadow--Active' : (paymentType == 'Discount')}" @click="paymentType = 'Discount'">{{ $t('Discount') }}</a> 
                   <a href="javascript:void(0);" id="Pending-Btn"  class="tableBtnArea-Btn-Normal DropShadow--Normal" :class="{'DropShadow--Active' : (paymentType == 'Pending')}" @click="paymentType = 'Pending'">{{ $t('Pending') }}</a> 
-                </div>
+                </div>                                 
               </div>
               <template v-if="!isEmpty(activeCustomer)">
                 <div class="BottomBtnArea pt--1 pb--1 pl--24 pr--24 display-flex" v-if="generateBillFLag"> 
@@ -250,7 +259,7 @@
                         <p>Number: {{ order.customer.phone }}</p>
                         <p>Name: {{ order.customer.name }}</p>
                       </td>
-                      <td><strong>{{  currency(sumBy(order.cartItems , 'total')) }}</strong></td>
+                      <td><strong>{{ currency(sumBy(cartItems, (item) => { return parseFloat(item.total) })) }}</strong></td>
                       <td>
                           <a href="javascript:void(0)" class="td-Btn-Normal DropShadow--Normal mr--1" @click="releaseOrder(index,order)">Release</a>
                           <a href="javascript:void(0)"  class="td-Btn-Normal DropShadow--Normal Text--Red" @click="delectHoldOrder(index,order)">Delete</a>
@@ -277,7 +286,7 @@
 
 <script lang="js">
 import { currency, scale } from "../../utils/currency"
-import { isEmpty , head, find, isNil, sumBy, forEach, assignIn} from "lodash"
+import { isEmpty , head, find, isNil, sumBy, forEach, assignIn, map} from "lodash"
 import {  mapState } from "vuex";
 
 import { Product, Customer, App, Sale, PurchaseHistory, Association } from "../../models"
@@ -309,6 +318,7 @@ export default {
       billNumber : moment().format("YYYYMMDDhhmmss"),
       editCustomerNameFlag:false,
       activeCustomerName:null,
+      addonTotal:0,
       form:{
               customer:{
                           phone:null,
@@ -323,7 +333,25 @@ export default {
 
     }
   },
-  methods:{       
+  methods:{
+    setActiveProductId(id){
+      if(this.activeProductId == id){
+        this.activeProductId = null
+      }else{
+        this.activeProductId = id
+      }      
+    },
+    updateCartAddon(cartIndex,addonIndex){
+      App.commit((state) => {      
+        state.cartItems[cartIndex].addons[addonIndex].active = !state.cartItems[cartIndex].addons[addonIndex].active;
+        if(state.cartItems[cartIndex].addons[addonIndex].active){
+          state.cartItems[cartIndex].total = Number(parseFloat(state.cartItems[cartIndex].total) + parseFloat(state.cartItems[cartIndex].addons[addonIndex].rate)).toFixed(2);
+        }else{
+          state.cartItems[cartIndex].total = Number(parseFloat(state.cartItems[cartIndex].total) - parseFloat(state.cartItems[cartIndex].addons[addonIndex].rate)).toFixed(2);
+        }
+        // 
+      })
+    },
     releaseOrder(index,order){
         if(isEmpty(this.cartItems)){
           App.commit((state) => {      
@@ -359,7 +387,6 @@ export default {
                       orderNumber:this.holdOrders.length + 1,
                       cartItems : this.cartItems,
                       customer  : this.activeCustomer,
-
        }
        //
         App.commit((state) => {      
@@ -374,9 +401,9 @@ export default {
           state.clearDues = flag
         })
         if(flag){
-          this.receiveAmount = parseFloat(sumBy(this.cartItems,'total')) + parseFloat(this.getDueAmount)
+          this.receiveAmount = parseFloat(sumBy(this.cartItems, (item) => { return item.total })) + parseFloat(this.getDueAmount)
         }else{
-          this.receiveAmount = parseFloat(sumBy(this.cartItems,'total'))
+          this.receiveAmount = parseFloat(sumBy(this.cartItems,(item) => { return item.total }))
         }        
     },
     updateEasyPieChart(target,value){
@@ -432,7 +459,8 @@ export default {
                     price: (['kg','KG'].includes(this.activeProduct.weight_unit)) ? this.appliedRate : 0,
                     quantity:(['kg','KG'].includes(this.activeProduct.weight_unit)) ? parseFloat(this.scaleWeight) : null,
                     total : (['kg','KG'].includes(this.activeProduct.weight_unit)) ? parseFloat(this.calculatedPrice) : 0 , 
-                    mask:this.activeProduct.mask
+                    mask:this.activeProduct.mask,
+                    addons: map(JSON.parse(this.activeProduct.rate.addons),(addon) => { addon.active = false; return addon;})
       }
       //       
       App.commit((state) => {
@@ -675,17 +703,17 @@ export default {
         return Number(dueAmt).toFixed(2)
     },
     getReceiveAmount(){
-                let receiveAmount = parseFloat(sumBy(this.cartItems,'total')) 
+                let receiveAmount = parseFloat(sumBy(this.cartItems,(item) => { return parseFloat(item.total) })) 
                 return Number(receiveAmount).toFixed(2)
     },
     getGrandTotal(){
         let grandTotal  = 0
         if(this.clearDues){
-          grandTotal = parseFloat(sumBy(this.cartItems,'total')) + parseFloat(this.getDueAmount)
+          grandTotal = parseFloat(sumBy(this.cartItems,(item) => { return parseFloat(item.total) })) + parseFloat(this.getDueAmount)
         }else{
-          grandTotal = parseFloat(sumBy(this.cartItems,'total')) 
+          grandTotal = parseFloat(sumBy(this.cartItems,(item) => { return parseFloat(item.total) })) 
         }        
-        return Number(grandTotal).toFixed(2)
+        return Number(grandTotal + parseFloat(this.addonTotal)).toFixed(2)
     },
     getRemainingAmount(){
       let remainingAmt = this.getGrandTotal - this.receiveAmount
@@ -758,8 +786,6 @@ export default {
       $(".Product-Item").hover(function () {
           $(this).find(".Main-Flip-Box").toggleClass("Active");
       });
-
-      console.log(this.$refs['product-panel-6'][0].clientWidth)
    },
   beforeMount() {
     this.onscreenKeyboard()

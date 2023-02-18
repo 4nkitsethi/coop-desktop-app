@@ -1916,7 +1916,6 @@ button[disabled] {
     border-collapse: collapse;
 	margin-top: 8px;
 	line-height: 2;
-	width: 100%;
 }
 
 .print-riceipt td.description,
@@ -4663,3 +4662,25 @@ button[disabled] {
 	float:left;
 }
 .Product-ItemWrap .Product-Item {}
+
+.addon{
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.addon-item {
+    font-size: 12px;
+    padding: 10px 12px;
+    border: 1px solid;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.addon-item.active{
+  box-shadow: -0.5em -0.5em 1.12em 0 rgb(55 56 58 / 45%), 0.75em 0.75em 1.5em 0 rgb(0 0 0 / 45%) inset;
+  border-left: 1px solid #bf8a00;
+  border-top: 1px solid #bf8a00;
+  color:#bf8a00;
+}
